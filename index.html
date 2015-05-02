@@ -4,6 +4,7 @@
 <script>
     
     var lba = {};
+    
     // Content for the page header
     var siteHeader = function(){
         return [
@@ -14,10 +15,9 @@
     
     };
     
-    // view of the body 
-    var siteBody = function(power) {
+    // calculator view module 
+    var powerConversion = function(power){
         return [
-            m("h1","Link Budget Analysis"),
             m("p","A simple calculator to help you convert the power units"),
             m("input[type=number]", {
                 oninput: m.withAttr("value", power.setdBW),
@@ -40,9 +40,17 @@
             }),
             "Watts"
         ];
+    };
+    
+    // view of the body 
+    var siteBody = function(power) {
+        return [
+            m("h1","Link Budget Analysis"),
+            m("section[id='calculator']",powerConversion(power))
+        ];
     }
     
-    // controller of the power convertor
+    // Entire controller 
     lba.controller = function() {
         this.setdBm = function(dBm) {
             this.dBm = +dBm;
