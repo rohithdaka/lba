@@ -10,7 +10,8 @@
         return [
             m("title","Link Budget Analysis"),
             m("meta",{name: "author", content: "Rohith Daka"}),
-            m("meta",{name: "keywords", content: "Channel Coding"})
+            m("meta",{name: "keywords", content: "Channel Coding"}),
+            m("link",{rel: "stylesheet", href: "lba.css"})
         ];
     
     };
@@ -19,26 +20,34 @@
     var powerConversion = function(power){
         return [
             m("p","A simple calculator to help you convert the power units"),
-            m("input[type=number]", {
-                oninput: m.withAttr("value", power.setdBW),
-                value: power.dBW
-            }),
-            "dBW    ⇄   ",
-            m("input[type=number]", {
-                oninput: m.withAttr("value", power.setdBm),
-                value: power.dBm
-            }),
-            "dBm    ⇄   ",
-            m("input[type=number]", {
-                oninput: m.withAttr("value", power.setmW),
-                 value: power.mW
-            }),
-            "mW    ⇄   ", 
-            m("input[type=number]", {
-                oninput: m.withAttr("value", power.setW),
-                 value: power.W
-            }),
+            m("article.powercalc",[
+                m("input[type=number]", {
+                    oninput: m.withAttr("value", power.setdBW),
+                    value: power.dBW
+                }),
+                "dBW    ⇄   "
+            ]),
+            m("article.powercalc",[
+                m("input[type=number]", {
+                    oninput: m.withAttr("value", power.setdBm),
+                    value: power.dBm
+                }),
+                "dBm    ⇄   "
+            ]),
+            m("article.powercalc",[
+                m("input[type=number]", {
+                    oninput: m.withAttr("value", power.setmW),
+                    value: power.mW
+                }),
+                "mW    ⇄   "
+            ]),
+            m("article.powercalc",[
+                m("input[type=number]", {
+                    oninput: m.withAttr("value", power.setW),
+                    value: power.W
+                }),
             "Watts"
+            ])
         ];
     };
     
