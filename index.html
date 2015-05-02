@@ -4,6 +4,7 @@
 <script>
     
     var lba = {};
+    // Content for the page header
     var siteHeader = function(){
         return [
             m("title","Link Budget Analysis"),
@@ -13,21 +14,77 @@
     
     };
     
-    var siteBody = function() {
+    // view of the body 
+    var siteBody = function(power) {
         return [
-            m("h1","Link Budget")
+            m("h1","Link Budget Analysis"),
+            m("p","A simple calculator to help you convert the power units"),
+            m("input[type=number]", {
+                oninput: m.withAttr("value", power.setdBW),
+                value: power.dBW
+            }),
+            "dBW    ⇄   ",
+            m("input[type=number]", {
+                oninput: m.withAttr("value", power.setdBm),
+                value: power.dBm
+            }),
+            "dBm    ⇄   ",
+            m("input[type=number]", {
+                oninput: m.withAttr("value", power.setmW),
+                 value: power.mW
+            }),
+            "mW    ⇄   ", 
+            m("input[type=number]", {
+                oninput: m.withAttr("value", power.setW),
+                 value: power.W
+            }),
+            "Watts"
         ];
     }
     
-    lba.controller = function (){};
+    // controller of the power convertor
+    lba.controller = function() {
+        this.setdBm = function(dBm) {
+            this.dBm = +dBm;
+            this.mW = +(Math.pow(10,dBm/10));
+            this.W = +(this.mW * Math.pow(10,-3));
+            this.dBW = +(dBm - 30);
+        }.bind(this)
+  
+        this.setmW = function(mW) {
+            this.mW = +mW;
+            this.dBm = +(10*Math.log(mW)/Math.log(10));
+            this.W = +(mW * Math.pow(10,-3));
+            this.dBW = +(this.dBm - 30);
+        }.bind(this)
+        
+        this.setW = function(W){
+            this.mW = +(W*Math.pow(10,3)).toFixed(2);
+            this.dBm = +(10*Math.log(this.mW)/Math.log(10));
+            this.W = +W;
+            this.dBW = +(this.dBm - 30);
+        }.bind(this)
+        
+        this.setdBW = function(dBW){
+            this.dBW = +dBW;
+            this.dBm = +dBW + 30;
+            this.mW = +(Math.pow(10,this.dBm/10));
+            this.W = +(this.mW*Math.pow(10,-3));
+        }.bind(this)
+        
+      
+        this.setdBm(0);
+    };
     
-    lba.view = function() {
+    // declaring the view function 
+    lba.view = function(power) {
         return m("html", [
             m("head", siteHeader()),
-            m("body", siteBody())
+            m("body", siteBody(power))
         ]);
     };
 
+    // initialising the app
     m.mount(document, lba);
     
 </script>
