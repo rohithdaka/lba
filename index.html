@@ -1,0 +1,33 @@
+<!doctype html>
+    <script src="http://cdn.jsdelivr.net/mithril/0.2.0/mithril.min.js"></script>
+
+<script>
+    
+    var lba = {};
+    var siteHeader = function(){
+        return [
+            m("title","Link Budget Analysis"),
+            m("meta",{name: "author", content: "Rohith Daka"}),
+            m("meta",{name: "keywords", content: "Channel Coding"})
+        ];
+    
+    };
+    
+    var siteBody = function() {
+        return [
+            m("h1","Link Budget")
+        ];
+    }
+    
+    lba.controller = function (){};
+    
+    lba.view = function() {
+        return m("html", [
+            m("head", siteHeader()),
+            m("body", siteBody())
+        ]);
+    };
+
+    m.mount(document, lba);
+    
+</script>
