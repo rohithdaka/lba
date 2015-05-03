@@ -1,20 +1,25 @@
 #powerConverter {
     float: right;
     padding: 5px; 
+    position:relative;
 }
 
 #distanceConverter{
     float: right;
     padding: 5px;
+    position: relative;
 }
 
 #link {
     float: left;
     padding: 5px;
+    position: relative;
 }
 table tr td {
     padding: 5px;
     margin: 5px;
+    border:1px;
+    border-color: chocolate;
 }
 
 h1 {
