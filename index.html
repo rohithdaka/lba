@@ -17,39 +17,30 @@
     };
     
     // calculator view module 
+    var powerConversionUnits = [
+        {'func': 'setdBW', 'variable':'dBW','suffix':'dBW'},
+        {'func': 'setdBm', 'variable':'dBm','suffix':'dBm'},
+        {'func': 'setmW', 'variable':'mW','suffix':'mW'},
+        {'func': 'setW', 'variable':'W','suffix':'W'}
+    ];
+    
     var powerConversion = function(power){
-        return [
-            m("p","A simple calculator to help you convert the power units"),
-            m("article.powercalc",[
-                m("input[type=number]", {
-                    oninput: m.withAttr("value", power.setdBW),
-                    value: power.dBW
-                }),
-                "dBW    ⇄   "
-            ]),
-            m("article.powercalc",[
-                m("input[type=number]", {
-                    oninput: m.withAttr("value", power.setdBm),
-                    value: power.dBm
-                }),
-                "dBm    ⇄   "
-            ]),
-            m("article.powercalc",[
-                m("input[type=number]", {
-                    oninput: m.withAttr("value", power.setmW),
-                    value: power.mW
-                }),
-                "mW    ⇄   "
-            ]),
-            m("article.powercalc",[
-                m("input[type=number]", {
-                    oninput: m.withAttr("value", power.setW),
-                    value: power.W
-                }),
-            "Watts"
-            ])
-        ];
+        return m("table", [
+            m("caption","A simple calculator to help you convert the power units"),
+            powerConversionUnits.map(function(unit,index){
+                return m("tr",
+                    m("td", [
+                        m("input[type=number]", {
+                            oninput: m.withAttr("value", power[unit.func]),
+                            value: power[unit.variable]
+                        }),
+                        unit.suffix
+                    ])
+                );
+            })
+            ]);
     };
+    
     
     // view of the body 
     var siteBody = function(power) {
@@ -61,6 +52,8 @@
     
     // Entire controller 
     lba.controller = function() {
+        
+        // Controller for Power conversion calculator 
         this.setdBm = function(dBm) {
             this.dBm = +dBm;
             this.mW = +(Math.pow(10,dBm/10));
@@ -88,9 +81,10 @@
             this.mW = +(Math.pow(10,this.dBm/10));
             this.W = +(this.mW*Math.pow(10,-3));
         }.bind(this)
-        
-      
+    
         this.setdBm(0);
+        
+        //Controller for Link Analysis
     };
     
     // declaring the view function 
