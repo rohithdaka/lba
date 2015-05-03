@@ -37,24 +37,26 @@
     
     // link view component
     var linkParameters = [
-        {'text':'Transmit Power','variable':'Pt','suffix':'dBm'},
-        {'text':'Transmit Feeder Loss','variable':'Lt','suffix':'dB'},
-        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB'},
-        {'text':'EIRP','variable':'EIRP','suffix':'dBm'},
-        {'text':'Frequency','variable':'f','suffix':'MHz'},
-        {'text':'Distance','variable':'D','suffix':'km'},
-        {'text':'Path Loss','variable':'Lp','suffix':'dB'},
-        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB'},
-        {'text':'Receive Feeder Loss','variable':'Lr','suffix':'dB'},
-        {'text':'Received Power','variable':'Pr','suffix':'dBm'},
-        {'text':'Noise Power','variable':'Np','suffix':'dBm'},
-        {'text':'Bandwidth','variable':'BW','suffix':'KHz'},
-        {'text':'Data Rate','variable':'R','suffix':'bps'},
-        {'text':'Eb/No','variable':'Lr','suffix':'dB'},
-        
-        
+        {'text':'Transmit Power','variable':'Pt','suffix':'dBm','calcvalue':false,'func':'setPt',},
+        {'text':'Transmit Feeder/Pointing Losses','variable':'Lt','suffix':'dB','calcvalue':false,'func':'setLt'},
+        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB','calcvalue':false,'func':'setGt'},
+        {'text':'EIRP','variable':'EIRP','suffix':'dBm','calcvalue':true,'func':'setEIRP'},
+        {'text':'Frequency','variable':'f','suffix':'MHz','calcvalue':false,'func':'setf'},
+        {'text':'Distance','variable':'D','suffix':'km','calcvalue':false,'func':'setD'},
+        {'text':'Path Loss','variable':'Lp','suffix':'dB','calcvalue':true,'func':'setLp'},
+        {'text':'Atmospheric Attenuation','variable':'La','suffix':'dB','calcvalue':false,'func':'setLa'},
+        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB','calcvalue':false,'func':'setGr'},
+        {'text':'Receive Feeder/Pointing Losses','variable':'Lr','suffix':'dB','calcvalue':false,'func':'setLr'},
+        {'text':'Received Power','variable':'Pr','suffix':'dBm','calcvalue':true,'func':'setPr'},
+        {'text':'Thermal Noise Temperature','variable':'Nt','suffix':'Kelvin','calcvalue':false,'func':'setNt'},
+        {'text':'Bandwidth','variable':'BW','suffix':'KHz','calcvalue':false,'func':'setBW'},
+        {'text':'Noise Figure','variable':'Nf','suffix':'dB','calcvalue':false,'func':'setNf'},
+        {'text':'Total Noise Power','variable':'Np','suffix':'dBm','calcvalue':true,'func':'setNp'},
+        {'text':'SNR','variable':'SNR','suffix':'dB','calcvalue':true,'func':'setSNR'},
+        {'text':'Data Rate','variable':'R','suffix':'bps','calcvalue':false,'func':'setR'},
+        {'text':'Eb/No','variable':'EbNo','suffix':'dB','calcvalue':true,'func':'setEbNo'}
     ];
-    var linkCalculation = function(link){
+    var linkCalculation = function(power){
         return m("table", [
             m("caption","Link Analysis"),
             linkParameters.map(function(param,index){
@@ -62,7 +64,9 @@
                     m("td",param.text),
                     m("td", [
                         m("input[type=number]", {
-                            value: link[param.variable]
+                            onchange: m.withAttr("value", power[param.func]),
+                            value: power[param.variable],
+                            readOnly: param.calcvalue
                         }),
                         param.suffix
                     ])
@@ -73,57 +77,136 @@
     };
     
     // view of the body 
-    var siteBody = function(power,link) {
+    var siteBody = function(power) {
         return [
             m("h1","Link Budget Analysis"),
             m("section#calculator]",powerConversion(power)),
-            m("section#link",linkCalculation(link))
+            m("section#link",linkCalculation(power))
         ];
     }
     // Entire controller 
     lba.controller = function() {
-        
+  
         // Controller for Power conversion calculator 
         this.setdBm = function(dBm) {
             this.dBm = +dBm;
             this.mW = +(Math.pow(10,dBm/10));
             this.W = +(this.mW * Math.pow(10,-3));
             this.dBW = +(dBm - 30);
-        }.bind(this)
+        }.bind(this);
   
         this.setmW = function(mW) {
             this.mW = +mW;
             this.dBm = +(10*Math.log(mW)/Math.log(10));
             this.W = +(mW * Math.pow(10,-3));
             this.dBW = +(this.dBm - 30);
-        }.bind(this)
+        }.bind(this);
         
         this.setW = function(W){
             this.mW = +(W*Math.pow(10,3)).toFixed(2);
             this.dBm = +(10*Math.log(this.mW)/Math.log(10));
             this.W = +W;
             this.dBW = +(this.dBm - 30);
-        }.bind(this)
+        }.bind(this);
         
         this.setdBW = function(dBW){
             this.dBW = +dBW;
             this.dBm = +dBW + 30;
             this.mW = +(Math.pow(10,this.dBm/10));
             this.W = +(this.mW*Math.pow(10,-3));
-        }.bind(this)
+        }.bind(this);
     
         this.setdBm(0);
         
-        //Controller for Link Analysis
+        //Controller for Link
         
+        var K = 1.3806488e-23;
+        this.setPt = function(Pt){
+            this.Pt = +Pt;
+            this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+        }.bind(this);
+        this.setGt = function(Gt){
+            this.Gt = +Gt;
+            this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+        }.bind(this);
+        this.setLt = function(Lt){
+            this.Lt = +Lt;
+            this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+        }.bind(this);
+        this.setEIRP = function(EIRP){
+            this.EIRP = +EIRP;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+        }.bind(this);
+        this.setf = function(f){
+            this.f = +f;
+            this.Lp = +(20*Math.log(this.D) + 20*Math.log(this.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+        }.bind(this);
+        this.setD = function(D){
+            this.D = +D;
+            this.Lp = +(20*Math.log(this.D) + 20*Math.log(this.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+        }.bind(this);
+        this.setLp = function(Lp){
+            this.Lp = +Lp;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr - this.Lr);
+        }.bind(this);
+        this.setLa = function(La){
+            this.La = +La;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+        }.bind(this);
+        this.setGr = function(Gr){
+            this.Gr = +Gr;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.Np = +((10*Math.log(this.Nt * this.BW * K))/Math.log(10) + 30 + 30 + this.Gr + this.Nf);
+        }.bind(this);
+        this.setLr = function(Lr){
+            this.Lr = +Lr;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+        }.bind(this);
+        this.setPr = function(Pr){
+            this.Pr = +Pr;
+            this.SNR = +(this.Pr - this.Np);
+        }.bind(this);
+        this.setNt = function(Nt){
+            this.Nt = +Nt;
+            this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+        }.bind(this);
+        this.setNf = function(Nf){
+            this.Nf = +Nf;
+            this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+        }.bind(this);
+        this.setBW = function(BW){
+            this.BW = +BW;
+            this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10)) ;
+        }.bind(this);
+        this.setNp = function(Np){
+            this.Np = +Np;
+            this.SNR = +(this.Pr - this.Np);
+        }.bind(this);
+        this.setSNR = function(SNR){
+            this.SNR = +SNR;
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
+        }.bind(this);
+        this.setR = function(R){
+            this.R = +R;
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10)) ;
+        }.bind(this);
+        
+        
+        
+        
+        
+        
+        
+
         
     };
     
     // View of the entire site
-    lba.view = function(power,link) {
+    lba.view = function(power) {
         return m("html", [
             m("head", siteHeader()),
-            m("body", siteBody(power,link))
+            m("body", siteBody(power))
         ]);
     };
 
