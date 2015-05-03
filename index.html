@@ -64,7 +64,7 @@
                     m("td",param.text),
                     m("td", [
                         m("input[type=number]", {
-                            onchange: m.withAttr("value", power[param.func]),
+                            oninput: m.withAttr("value", power[param.func]),
                             value: power[param.variable],
                             readOnly: param.calcvalue
                         }),
@@ -124,73 +124,98 @@
         this.setPt = function(Pt){
             this.Pt = +Pt;
             this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setGt = function(Gt){
             this.Gt = +Gt;
             this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setLt = function(Lt){
             this.Lt = +Lt;
             this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setEIRP = function(EIRP){
             this.EIRP = +EIRP;
-            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
         }.bind(this);
         this.setf = function(f){
             this.f = +f;
             this.Lp = +(20*Math.log(this.D) + 20*Math.log(this.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr - this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setD = function(D){
             this.D = +D;
             this.Lp = +(20*Math.log(this.D) + 20*Math.log(this.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr - this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setLp = function(Lp){
             this.Lp = +Lp;
-            this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr - this.Lr);
         }.bind(this);
         this.setLa = function(La){
             this.La = +La;
             this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setGr = function(Gr){
             this.Gr = +Gr;
             this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
             this.Np = +((10*Math.log(this.Nt * this.BW * K))/Math.log(10) + 30 + 30 + this.Gr + this.Nf);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setLr = function(Lr){
             this.Lr = +Lr;
             this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setPr = function(Pr){
             this.Pr = +Pr;
-            this.SNR = +(this.Pr - this.Np);
         }.bind(this);
         this.setNt = function(Nt){
             this.Nt = +Nt;
             this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setNf = function(Nf){
             this.Nf = +Nf;
             this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+            this.SNR = +(this.Pr - this.Np);
+            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setBW = function(BW){
             this.BW = +BW;
             this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
+            this.SNR = +(this.Pr - this.Np);
             this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10)) ;
         }.bind(this);
         this.setNp = function(Np){
             this.Np = +Np;
-            this.SNR = +(this.Pr - this.Np);
         }.bind(this);
         this.setSNR = function(SNR){
             this.SNR = +SNR;
-            this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));
         }.bind(this);
         this.setR = function(R){
             this.R = +R;
             this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10)) ;
         }.bind(this);
+        this.setEbNo = function(EbNo){
+            this.EbNo = +EbNo;
+        }.bind(this);
+        
         
         
         
