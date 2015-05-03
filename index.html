@@ -1,10 +1,7 @@
 <!doctype html>
-    <script src="http://cdn.jsdelivr.net/mithril/0.2.0/mithril.min.js"></script>
-
+<script src="http://cdn.jsdelivr.net/mithril/0.2.0/mithril.min.js"></script>
 <script>
-    
     var lba = {};
-    
     // Content for the page header
     var siteHeader = function(){
         return [
@@ -13,43 +10,76 @@
             m("meta",{name: "keywords", content: "Channel Coding"}),
             m("link",{rel: "stylesheet", href: "lba.css"})
         ];
-    
     };
-    
-    // calculator view module 
+    // calculator view component 
     var powerConversionUnits = [
-        {'func': 'setdBW', 'variable':'dBW','suffix':'dBW'},
-        {'func': 'setdBm', 'variable':'dBm','suffix':'dBm'},
-        {'func': 'setmW', 'variable':'mW','suffix':'mW'},
-        {'func': 'setW', 'variable':'W','suffix':'W'}
+        {'func': 'setdBW','suffix':'dBW'},
+        {'func': 'setdBm','suffix':'dBm'},
+        {'func': 'setmW','suffix':'mW'},
+        {'func': 'setW','suffix':'W'}
     ];
-    
     var powerConversion = function(power){
         return m("table", [
-            m("caption","A simple calculator to help you convert the power units"),
+            m("caption","Power Units Convertor"),
             powerConversionUnits.map(function(unit,index){
                 return m("tr",
                     m("td", [
                         m("input[type=number]", {
                             oninput: m.withAttr("value", power[unit.func]),
-                            value: power[unit.variable]
+                            value: power[unit.suffix]
                         }),
                         unit.suffix
                     ])
                 );
             })
-            ]);
+        ]);
     };
     
+    // link view component
+    var linkParameters = [
+        {'text':'Transmit Power','variable':'Pt','suffix':'dBm'},
+        {'text':'Transmit Feeder Loss','variable':'Lt','suffix':'dB'},
+        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB'},
+        {'text':'EIRP','variable':'EIRP','suffix':'dBm'},
+        {'text':'Frequency','variable':'f','suffix':'MHz'},
+        {'text':'Distance','variable':'D','suffix':'km'},
+        {'text':'Path Loss','variable':'Lp','suffix':'dB'},
+        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB'},
+        {'text':'Receive Feeder Loss','variable':'Lr','suffix':'dB'},
+        {'text':'Received Power','variable':'Pr','suffix':'dBm'},
+        {'text':'Noise Power','variable':'Np','suffix':'dBm'},
+        {'text':'Bandwidth','variable':'BW','suffix':'KHz'},
+        {'text':'Data Rate','variable':'R','suffix':'bps'},
+        {'text':'Eb/No','variable':'Lr','suffix':'dB'},
+        
+        
+    ];
+    var linkCalculation = function(link){
+        return m("table", [
+            m("caption","Link Analysis"),
+            linkParameters.map(function(param,index){
+                return m("tr",
+                    m("td",param.text),
+                    m("td", [
+                        m("input[type=number]", {
+                            value: link[param.variable]
+                        }),
+                        param.suffix
+                    ])
+                );
+            })
+        ]);
+        
+    };
     
     // view of the body 
-    var siteBody = function(power) {
+    var siteBody = function(power,link) {
         return [
             m("h1","Link Budget Analysis"),
-            m("section[id='calculator']",powerConversion(power))
+            m("section#calculator]",powerConversion(power)),
+            m("section#link",linkCalculation(link))
         ];
     }
-    
     // Entire controller 
     lba.controller = function() {
         
@@ -85,13 +115,15 @@
         this.setdBm(0);
         
         //Controller for Link Analysis
+        
+        
     };
     
-    // declaring the view function 
-    lba.view = function(power) {
+    // View of the entire site
+    lba.view = function(power,link) {
         return m("html", [
             m("head", siteHeader()),
-            m("body", siteBody(power))
+            m("body", siteBody(power,link))
         ]);
     };
 
