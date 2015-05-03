@@ -18,15 +18,15 @@
         {'func': 'setmW','suffix':'mW'},
         {'func': 'setW','suffix':'W'}
     ];
-    var powerConversion = function(power){
+    var powerConversion = function(control){
         return m("table", [
-            m("caption","Power Units Convertor"),
+            m("caption","Power Units Converter"),
             powerConversionUnits.map(function(unit,index){
                 return m("tr",
                     m("td", [
                         m("input[type=number]", {
-                            oninput: m.withAttr("value", power[unit.func]),
-                            value: power[unit.suffix]
+                            oninput: m.withAttr("value", control[unit.func]),
+                            value: control[unit.suffix]
                         }),
                         unit.suffix
                     ])
@@ -35,6 +35,30 @@
         ]);
     };
     
+    var distanceConversionUnits = [
+        {'func': 'setMiles','suffix':'Miles'},
+        {'func': 'setKM','suffix':'KM'},
+        {'func': 'setAU','suffix':'AU'},
+    ];
+    
+    var distanceConversion = function(control){
+        return m("table", [
+            m("caption","Distance Units Converter"),
+            distanceConversionUnits.map(function(unit,index){
+                return m("tr",
+                    m("td", [
+                        m("input[type=number]", {
+                            oninput: m.withAttr("value", control[unit.func]),
+                            value: control[unit.suffix]
+                        }),
+                        unit.suffix
+                    ])
+                );
+            })
+        ]);
+    };
+    
+        
     // link view component
     var linkParameters = [
         {'text':'Transmit Power','variable':'Pt','suffix':'dBm','calcvalue':false,'func':'setPt','initialValue':'25'},
@@ -56,7 +80,7 @@
         {'text':'Data Rate','variable':'R','suffix':'bps','calcvalue':false,'func':'setR','initialValue':'1000'},
         {'text':'Eb/No','variable':'EbNo','suffix':'dB','calcvalue':true,'func':'setEbNo','initialValue':''}
     ];
-    var linkCalculation = function(power){
+    var linkCalculation = function(control){
         return m("table", [
             m("caption","Link Analysis"),
             linkParameters.map(function(param,index){
@@ -64,8 +88,8 @@
                     m("td",param.text),
                     m("td", [
                         m("input[type=number]", {
-                            oninput: m.withAttr("value", power[param.func]),
-                            value: power[param.variable],
+                            oninput: m.withAttr("value", control[param.func]),
+                            value: control[param.variable],
                             readOnly: param.calcvalue
                         }),
                         param.suffix
@@ -77,46 +101,64 @@
     };
     
     // view of the body 
-    var siteBody = function(power) {
+    var siteBody = function(control) {
         return [
             m("h1","Link Budget Analysis"),
-            m("section#calculator]",powerConversion(power)),
-            m("section#link",linkCalculation(power))
+            m("section#powerConverter]",powerConversion(control)),
+            m("section#distanceConverter]",distanceConversion(control)),
+            m("section#link",linkCalculation(control))
         ];
     }
     // Entire controller 
     lba.controller = function() {
         var ctrl = this;
         // Controller for Power conversion calculator 
-        this.setdBm = function(dBm) {
+        ctrl.setdBm = function(dBm) {
             this.dBm = +dBm;
             this.mW = +(Math.pow(10,dBm/10));
             this.W = +(this.mW * Math.pow(10,-3));
             this.dBW = +(dBm - 30);
-        }.bind(this);
-  
-        this.setmW = function(mW) {
+        }.bind(ctrl);
+        ctrl.setmW = function(mW) {
             this.mW = +mW;
             this.dBm = +(10*Math.log(mW)/Math.log(10));
             this.W = +(mW * Math.pow(10,-3));
             this.dBW = +(this.dBm - 30);
-        }.bind(this);
-        
-        this.setW = function(W){
+        }.bind(ctrl);   
+        ctrl.setW = function(W){
             this.mW = +(W*Math.pow(10,3)).toFixed(2);
             this.dBm = +(10*Math.log(this.mW)/Math.log(10));
             this.W = +W;
             this.dBW = +(this.dBm - 30);
-        }.bind(this);
-        
-        this.setdBW = function(dBW){
+        }.bind(ctrl); 
+        ctrl.setdBW = function(dBW){
             this.dBW = +dBW;
             this.dBm = +dBW + 30;
             this.mW = +(Math.pow(10,this.dBm/10));
             this.W = +(this.mW*Math.pow(10,-3));
-        }.bind(this);
-    
-        this.setdBm(0);
+        }.bind(ctrl); 
+        ctrl.setdBm(0);
+        
+        //Controller for distance conversion
+        ctrl.setMiles = function(M) {
+            this.Miles = +M;
+            this.KM = +(M*1.60934);
+            this.AU = +(this.KM / 149597871);
+        }.bind(ctrl);
+  
+        ctrl.setKM = function(KM) {
+            this.KM = +KM;
+            this.Miles = +(KM/1.60934);
+            this.AU = +(KM/ 149597871);
+        }.bind(ctrl);
+        
+        ctrl.setAU = function(AU){
+            this.AU = +AU;
+            this.KM = +(AU * 149597871 );
+            this.Miles = +(this.KM/1.60934);
+        }.bind(ctrl);
+        
+        ctrl.setKM(10);
         
         //Controller for Link
         
@@ -125,23 +167,25 @@
         linkParameters.map(function(p,index){
             ctrl[p.func] = function(x){
                 ctrl[p.variable] = +x;
-                this.EIRP = +(this.Pt + this.Gt - this.Lt) ;
-                this.Lp = +(20*Math.log(this.D) + 20*Math.log(this.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
-                this.Pr = +(this.EIRP - this.Lp - this.La + this.Gr -this.Lr);
-                this.Np = +((10*Math.log(this.Nt * this.BW * 1000 * K))/Math.log(10) + 30 + this.Gr + this.Nf);
-                this.SNR = +(this.Pr - this.Np);
-                this.EbNo = +( this.SNR - (10*Math.log(this.R / (this.BW * 1000) ) )/Math.log(10));    
+                ctrl.EIRP = +(ctrl.Pt + ctrl.Gt - ctrl.Lt) ;
+                ctrl.Lp = +(20*Math.log(ctrl.D) + 20*Math.log(ctrl.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+                ctrl.Pr = +(ctrl.EIRP - ctrl.Lp - ctrl.La + ctrl.Gr -ctrl.Lr);
+                ctrl.Np = +((10*Math.log(ctrl.Nt * ctrl.BW * 1000 * K))/Math.log(10) + 30 + ctrl.Gr + ctrl.Nf);
+                ctrl.SNR = +(ctrl.Pr - ctrl.Np);
+                ctrl.EbNo = +( ctrl.SNR - (10*Math.log(ctrl.R / (ctrl.BW * 1000) ) )/Math.log(10));    
             }.bind(ctrl);
             
             ctrl[p.func](p.initialValue);
-        });               
+        }); 
+        
+        
     };
     
     // View of the entire site
-    lba.view = function(power) {
+    lba.view = function(control) {
         return m("html", [
             m("head", siteHeader()),
-            m("body", siteBody(power))
+            m("body", siteBody(control))
         ]);
     };
 

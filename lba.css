@@ -1,6 +1,11 @@
-#calculator {
+#powerConverter {
     float: right;
     padding: 5px; 
+}
+
+#distanceConverter{
+    float: right;
+    padding: 5px;
 }
 
 #link {
