@@ -16,6 +16,7 @@ table tr td {
     padding: 2px;
     margin: 2px;
 }
+
 tr.neutral {
     background-color: lightskyblue;
 }
@@ -29,7 +30,10 @@ td {
     font-family: sans-serif;
 }
 caption{
-    font-size: 1.5em;
+    padding-top: 20px;
+    font-size: 1em;
+    font-weight: 200;
+    font-family: sans-serif;
 }
 
 html {
@@ -41,13 +45,16 @@ p {
     margin:1px;
     padding:1px;
     border:1px;
-    text-align: left;
+    text-align: left;    
+}
+
+p.explaination {
     font-family: sans-serif;
-    
+    text-indent: 1em;
 }
 
 p.output{
-    font-weight: 900;
+    font-weight: 600;
     text-align: right;
 }
 
