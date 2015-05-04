@@ -1,26 +1,53 @@
-#powerConverter {
-    float: right;
-    padding: 5px; 
+#miscTools {
+    float:right;
     position:relative;
-}
-
-#distanceConverter{
-    float: right;
-    padding: 5px;
-    position: relative;
+    padding: 2px;
+    text-align: left;
 }
 
 #link {
     float: left;
-    padding: 5px;
+    padding: 2px;
     position: relative;
+    width: 50%;
 }
+
 table tr td {
-    padding: 5px;
-    margin: 5px;
-    border:1px;
-    border-color: chocolate;
+    padding: 2px;
+    margin: 2px;
 }
+tr.neutral {
+    background-color: lightskyblue;
+}
+tr.gain {
+    background-color: greenyellow;
+}
+tr.loss{
+    background-color: tomato;
+}
+caption{
+    font-size: 1.5em;
+}
+
+html {
+    min-width: 900px;
+    width:90%;
+}
+
+p {
+    margin:1px;
+    padding:1px;
+    border:1px;
+    text-align: left;
+    
+}
+
+p.output{
+    font-weight: 900;
+    text-align: right;
+}
+
+
 
 h1 {
     text-align: center;

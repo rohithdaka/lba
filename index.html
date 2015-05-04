@@ -5,7 +5,7 @@
     // Content for the page header
     var siteHeader = function(){
         return [
-            m("title","Link Budget Analysis"),
+            m("title","Wireless Link Budget Analysis"),
             m("meta",{name: "author", content: "Rohith Daka"}),
             m("meta",{name: "keywords", content: "Link Budget Analysis"}),
             m("meta",{name: "description", content: "An online tool to do link budget analysis"}),
@@ -62,39 +62,37 @@
         
     // link view component
     var linkParameters = [
-        {'text':'Transmit Power','variable':'Pt','suffix':'dBm','calcvalue':false,'func':'setPt','initialValue':'25'},
-        {'text':'Transmit Feeder/Pointing Losses','variable':'Lt','suffix':'dB','calcvalue':false,'func':'setLt','initialValue':'1'},
-        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB','calcvalue':false,'func':'setGt','initialValue':'10'},
-        {'text':'EIRP','variable':'EIRP','suffix':'dBm','calcvalue':true,'func':'setEIRP','initialValue':''},
-        {'text':'Frequency','variable':'f','suffix':'MHz','calcvalue':false,'func':'setf','initialValue':'2400'},
-        {'text':'Distance','variable':'D','suffix':'km','calcvalue':false,'func':'setD','initialValue':'1'},
-        {'text':'Path Loss','variable':'Lp','suffix':'dB','calcvalue':true,'func':'setLp','initialValue':''},
-        {'text':'Atmospheric Attenuation','variable':'La','suffix':'dB','calcvalue':false,'func':'setLa','initialValue':'3'},
-        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB','calcvalue':false,'func':'setGr','initialValue':'15'},
-        {'text':'Receive Feeder/Pointing Losses','variable':'Lr','suffix':'dB','calcvalue':false,'func':'setLr','initialValue':'2'},
-        {'text':'Received Power','variable':'Pr','suffix':'dBm','calcvalue':true,'func':'setPr','initialValue':''},
-        {'text':'Thermal Noise Temperature','variable':'Nt','suffix':'Kelvin','calcvalue':false,'func':'setNt','initialValue':'300'},
-        {'text':'Bandwidth','variable':'BW','suffix':'KHz','calcvalue':false,'func':'setBW','initialValue':'200'},
-        {'text':'Noise Figure','variable':'Nf','suffix':'dB','calcvalue':false,'func':'setNf','initialValue':'2.5'},
-        {'text':'Total Noise Power','variable':'Np','suffix':'dBm','calcvalue':true,'func':'setNp','initialValue':''},
-        {'text':'SNR','variable':'SNR','suffix':'dB','calcvalue':true,'func':'setSNR','initialValue':''},
-        {'text':'Data Rate','variable':'R','suffix':'bps','calcvalue':false,'func':'setR','initialValue':'1000'},
-        {'text':'Eb/No','variable':'EbNo','suffix':'dB','calcvalue':true,'func':'setEbNo','initialValue':''}
+        {'text':'Transmit Power','variable':'Pt','suffix':'dBm','calcvalue':false,'func':'setPt','initialValue':'25','inputType':"gain"},
+        {'text':'Transmit Feeder/Pointing Losses','variable':'Lt','suffix':'dB','calcvalue':false,'func':'setLt','initialValue':'1','inputType':"loss"},
+        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB','calcvalue':false,'func':'setGt','initialValue':'10','inputType':"gain"},
+        {'text':'EIRP','variable':'EIRP','suffix':'dBm','calcvalue':true,'func':'setEIRP','initialValue':'','inputType':"neutral"},
+        {'text':'Frequency','variable':'f','suffix':'MHz','calcvalue':false,'func':'setf','initialValue':'2400','inputType':"neutral"},
+        {'text':'Distance','variable':'D','suffix':'km','calcvalue':false,'func':'setD','initialValue':'1','inputType':"neutral"},
+        {'text':'Path Loss','variable':'Lp','suffix':'dB','calcvalue':true,'func':'setLp','initialValue':'','inputType':"loss"},
+        {'text':'Atmospheric Attenuation','variable':'La','suffix':'dB','calcvalue':false,'func':'setLa','initialValue':'3','inputType':"loss"},
+        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB','calcvalue':false,'func':'setGr','initialValue':'15','inputType':"gain"},
+        {'text':'Receive Feeder/Pointing Losses','variable':'Lr','suffix':'dB','calcvalue':false,'func':'setLr','initialValue':'2','inputType':"loss"},
+        {'text':'Received Power','variable':'Pr','suffix':'dBm','calcvalue':true,'func':'setPr','initialValue':'','inputType':"neutral"},
+        {'text':'Thermal Noise Temperature','variable':'Nt','suffix':'Kelvin','calcvalue':false,'func':'setNt','initialValue':'300','inputType':"neutral"},
+        {'text':'Bandwidth','variable':'BW','suffix':'KHz','calcvalue':false,'func':'setBW','initialValue':'200','inputType':"neutral"},
+        {'text':'Noise Figure','variable':'Nf','suffix':'dB','calcvalue':false,'func':'setNf','initialValue':'2.5','inputType':"neutral"},
+        {'text':'Total Noise Power','variable':'Np','suffix':'dBm','calcvalue':true,'func':'setNp','initialValue':'','inputType':"neutral"},
+        {'text':'SNR','variable':'SNR','suffix':'dB','calcvalue':true,'func':'setSNR','initialValue':'','inputType':"neutral"},
+        {'text':'Data Rate','variable':'R','suffix':'bps','calcvalue':false,'func':'setR','initialValue':'1000','inputType':"neutral"},
+        {'text':'Eb/No','variable':'EbNo','suffix':'dB','calcvalue':true,'func':'setEbNo','initialValue':'','inputType':"neutral"}
     ];
     var linkCalculation = function(control){
         return m("table", [
-            m("caption","Link Analysis"),
+            m("caption","Link Budget"),
             linkParameters.map(function(param,index){
-                return m("tr",
-                    m("td",param.text),
-                    m("td", [
-                        m("input[type=number]", {
-                            oninput: m.withAttr("value", control[param.func]),
-                            value: control[param.variable],
-                            readOnly: param.calcvalue
-                        }),
-                        param.suffix
-                    ])
+                return m("tr", {class: param.inputType}, //setting up class to distinguish gain/loss or nuetral type
+                    m("td",m("p",{class: (param.calcvalue ? "output": "input" )},param.text)), // input or output types
+                    m("td", m("input[type=number]", {
+                                oninput: m.withAttr("value", control[param.func]), //data binding 
+                                value: control[param.variable],
+                                readOnly: param.calcvalue
+                            })),
+                    m("td", param.suffix )    // Units
                 );
             })
         ]);
@@ -104,12 +102,26 @@
     // view of the body 
     var siteBody = function(control) {
         return [
-            m("h1","Link Budget Analysis"),
-            m("section#powerConverter]",powerConversion(control)),
-            m("section#distanceConverter]",distanceConversion(control)),
-            m("section#link",linkCalculation(control))
+            m("h1","Wireless Link Budget Analysis"),
+            m("section#miscTools",[
+                m("article#powerConverter]",powerConversion(control)),
+                m("article#distanceConverter]",distanceConversion(control))
+            ]),
+            m("section#link",[
+                linkCalculation(control),
+                m("article#legend", [
+                    m("h5", "How to use this?"),
+                    m("p","Parameters aligned to the left are usually the specifications of the individual components designed by engineers or the conditions in which the system has to operate. Parameters aligned to the right are the metrics that can guide engineers to decide the usability of the component they designed."),
+                    m("p","Greens are gains. Reds are losses. Left aligned are inputs. Right aligned are not.")
+                ]),
+                m("article#disclaimer", [
+                    m("h5", "Dislaimer"),
+                    m("p","This simple tool is to quickly analysis the wireless link budget. I wanted to replace the traditional spreadsheet way of doing this analysis. I am quite confident about the reliability of this app to act as an intuitive guide for communications engineers. A couple of simple unit conversion calculators are available too. This app is built over a weekend, so please excuse unfinished product. I just made it work, I will make it better soon"),
+                    m("p"," - Rohith Daka")
+                ])
+            ])
         ];
-    }
+    };
     // Entire controller 
     lba.controller = function() {
         var ctrl = this;
@@ -178,7 +190,6 @@
             
             ctrl[p.func](p.initialValue);
         }); 
-        
         
     };
     
