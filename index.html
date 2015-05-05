@@ -64,18 +64,18 @@
     var linkParameters = [
         {'text':'Transmit Power','variable':'Pt','suffix':'dBm','calcvalue':false,'func':'setPt','initialValue':'25','inputType':"gain"},
         {'text':'Transmit Feeder/Pointing Losses','variable':'Lt','suffix':'dB','calcvalue':false,'func':'setLt','initialValue':'1','inputType':"loss"},
-        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dB','calcvalue':false,'func':'setGt','initialValue':'10','inputType':"gain"},
+        {'text':'Transmit Antenna Gain','variable':'Gt','suffix':'dBi','calcvalue':false,'func':'setGt','initialValue':'10','inputType':"gain"},
         {'text':'EIRP','variable':'EIRP','suffix':'dBm','calcvalue':true,'func':'setEIRP','initialValue':'','inputType':"neutral"},
         {'text':'Frequency','variable':'f','suffix':'MHz','calcvalue':false,'func':'setf','initialValue':'2400','inputType':"neutral"},
         {'text':'Distance','variable':'D','suffix':'km','calcvalue':false,'func':'setD','initialValue':'1','inputType':"neutral"},
         {'text':'Path Loss','variable':'Lp','suffix':'dB','calcvalue':true,'func':'setLp','initialValue':'','inputType':"loss"},
         {'text':'Atmospheric Attenuation','variable':'La','suffix':'dB','calcvalue':false,'func':'setLa','initialValue':'3','inputType':"loss"},
-        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dB','calcvalue':false,'func':'setGr','initialValue':'15','inputType':"gain"},
+        {'text':'Receive Antenna Gain','variable':'Gr','suffix':'dBi','calcvalue':false,'func':'setGr','initialValue':'15','inputType':"gain"},
         {'text':'Receive Feeder/Pointing Losses','variable':'Lr','suffix':'dB','calcvalue':false,'func':'setLr','initialValue':'2','inputType':"loss"},
         {'text':'Received Power','variable':'Pr','suffix':'dBm','calcvalue':true,'func':'setPr','initialValue':'','inputType':"neutral"},
-        {'text':'Thermal Noise Temperature','variable':'Nt','suffix':'Kelvin','calcvalue':false,'func':'setNt','initialValue':'300','inputType':"neutral"},
+        {'text':'Receiver Operating Temperature','variable':'Nt','suffix':'Kelvin','calcvalue':false,'func':'setNt','initialValue':'300','inputType':"neutral"},
         {'text':'Bandwidth','variable':'BW','suffix':'KHz','calcvalue':false,'func':'setBW','initialValue':'200','inputType':"neutral"},
-        {'text':'Noise Figure','variable':'Nf','suffix':'dB','calcvalue':false,'func':'setNf','initialValue':'2.5','inputType':"neutral"},
+        {'text':'Receiver Noise Figure','variable':'Nf','suffix':'dB','calcvalue':false,'func':'setNf','initialValue':'2.5','inputType':"neutral"},
         {'text':'Total Noise Power','variable':'Np','suffix':'dBm','calcvalue':true,'func':'setNp','initialValue':'','inputType':"neutral"},
         {'text':'SNR','variable':'SNR','suffix':'dB','calcvalue':true,'func':'setSNR','initialValue':'','inputType':"neutral"},
         {'text':'Data Rate','variable':'R','suffix':'bps','calcvalue':false,'func':'setR','initialValue':'1000','inputType':"neutral"},
@@ -181,9 +181,9 @@
             ctrl[p.func] = function(x){
                 ctrl[p.variable] = +x;
                 ctrl.EIRP = +(ctrl.Pt + ctrl.Gt - ctrl.Lt) ;
-                ctrl.Lp = +(20*Math.log(ctrl.D) + 20*Math.log(ctrl.f * Math.pow(10,-3)))/Math.log(10) + 92.45;
+                ctrl.Lp = +(20*Math.log(ctrl.D) + 20*Math.log(ctrl.f))/Math.log(10) + 32.45;
                 ctrl.Pr = +(ctrl.EIRP - ctrl.Lp - ctrl.La + ctrl.Gr -ctrl.Lr);
-                ctrl.Np = +((10*Math.log(ctrl.Nt * ctrl.BW * 1000 * K))/Math.log(10) + 30 + ctrl.Gr + ctrl.Nf);
+                ctrl.Np = +((10*Math.log(ctrl.Nt*(ctrl.Nf -1) * ctrl.BW * 1000 * K))/Math.log(10) + 30 );
                 ctrl.SNR = +(ctrl.Pr - ctrl.Np);
                 ctrl.EbNo = +( ctrl.SNR - (10*Math.log(ctrl.R / (ctrl.BW * 1000) ) )/Math.log(10));    
             }.bind(ctrl);
